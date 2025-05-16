@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Atsakymas</title>
+</head>
+<body>
+    <h1>Įveskite klausimą ar tekstą</h1>
+    <form method="POST">
+         <input type="text" name="simptomas" required>
+         <textarea name="ivestis" required></textarea>
+         <button type="submit">Siųsti</button>
+    </form>
+
+    {% if atsakymas %}
+        <h2>AI atsakymas:</h2>
+        <p>{{ atsakymas }}</p>
+    {% endif %}
+</body>
+</html>

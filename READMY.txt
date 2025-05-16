@@ -1,0 +1,267 @@
+Įkėlus lentelę excel, ją tvarkiau, tuščios reiksmes nepildziau, nes kai perkeli i mysql uzsipildo null, 
+sutvarkiau stulpelius su visokiais simboliai
+Išfiltravus GNM konfliktas kas ir bus mano y , 
+pamačiau kad visos reikšmės yra unikalios, sugalvojau kad padarysiu nauja stulpeli ir sukursiu grupes, 
+padarius grupiu pasiskirstymas buvo toks kaip pavaizduota grafike 1(konfliktu-pasiskirstymas)
+Nusistaciau X kaip zmogaus ivestas tekstas pvz.: "skauda gerkle", o y kad paduotu atsakyma is konflikto grupes
+
+Pasiimu bandymui modeli 1. TF-IDF (Term Frequency - Inverse Document Frequency)
+Tai yra metodas, kuris tekstą paverčia skaičių vektoriumi, kurį jau galima naudoti modeliui.
+
+👉 Pavyzdys:
+Tarkime, turi šiuos simptomus:
+
+„skausmas gerklėje“
+
+„skausmas nugaroje“
+
+„negalėjimas kalbėti“
+
+TF-IDF vektorizatorius:
+Pasiima visus žodžius (terminus) iš tekstų.
+
+Kiekvienam žodžiui apskaičiuoja:
+
+TF – kiek kartų žodis pasitaiko dokumente.
+
+IDF – kiek retas tas žodis visoje kolekcijoje.
+
+💡 Žodžiai, kurie dažni viename tekste, bet reti visame rinkinyje (pvz., „gerklėje“), gaus aukštesnį svorį. Tokie žodžiai laikomi informatyviais.
+
+🎲 2. Naive Bayes klasifikatorius
+Tai paprastas, bet dažnai efektyvus modelis tekstui.
+
+Veikia remiantis Bayeso teorema:
+Jis skaičiuoja:
+
+Kokia tikimybė, kad tekstas priklauso klasei Y, žinant žodžius X
+
+Formaliai:
+
+less
+Copy
+Edit
+P(klasė | žodžiai) ∝ P(žodžiai | klasė) * P(klasė)
+„Naive“ dalis:
+Modelis daro labai stiprų supaprastinimą – tarkime, kad visi žodžiai nepriklausomi vienas nuo kito, t.y. nežino gramatikos, konteksto.
+
+🧪 Kodėl šis derinys geras?
+✅ Greitas: labai greitai treniruojamas net su tūkstančiais pavyzdžių.
+
+✅ Tinka trumpam tekstui: simptomai ar trumpos frazės.
+
+✅ Lengvai interpretuojamas.
+
+⚠️ Kada jis ribotas?
+❌ Neapdoroja žodžių tvarkos ar sakinių struktūros.
+
+❌ Netinka jei klasės labai nesubalansuotos (kaip tavo atveju).
+
+❌ Nesupranta sinonimų ar semantikos – pvz. „skausmas“ ir „diskomfortas“ jam skirtingi.
+
+Darau modeli pirmaji  (TF-IDF + Naive Bayes)  Modelio tikslumą gaunu 0,25 (tai matyt dėl to kad yra daug skirtingu klasiu),
+kai kurios klase nebuvo prognozuotos (modelis ne karto ju neparinko). Todėl neįmanoma apskaičiuoti precision / recall / f1-score – gaunama 0
+
+Išsiskyrimo konfliktas       0.38      0.70      0.49        20
+
+Metricas	Reikšmė	Paaiškinimas
+precision	0.38	Tik 38% prognozių, kur modelis sakė „Išsiskyrimo konfliktas“, buvo teisingos
+recall	0.70	Modelis teisingai „pagavo“ 70% visų tikrų „Išsiskyrimo konfliktas“ įrašų
+f1-score	0.49	Balansas tarp precision ir recall (vidutinė kokybė)
+support	20	Testavimo duomenyse buvo 20 įrašų šiai grupei
+
+bandau paleisti dar karta, pasalindama Stop word
+
+gaunu dar mazesni, Modelio tikslumas: 0.2391304347826087
+
+Imu kita modeli: TF-IDF + Random Forest
+
+1. TF-IDF (Term Frequency – Inverse Document Frequency)
+Tai metodas, kuris konvertuoja tekstą į skaitinę formą (vektorus), kad kompiuteris galėtų jį „suprasti“. Jis veikia taip:
+
+Term Frequency (TF): Kiek kartų žodis pasirodo dokumente.
+
+Inverse Document Frequency (IDF): Kiek retas tas žodis visame korpuse.
+
+Šitaip TF-IDF pabrėžia unikalius žodžius, kurie yra svarbesni konkrečiam tekstui, o dažni žodžiai kaip „ir“, „kad“, „aš“ ignoruojami.
+
+🔹 2. Random Forest Classifier
+Tai mašininio mokymosi algoritmas, kuris:
+
+Sukuria daug skirtingų sprendimų medžių (angl. decision trees),
+
+Kiekvienas medis balsuoja už savo sprendimą (pvz., konfliktų grupę),
+
+Galutinis sprendimas priimamas daugumos balsavimu.
+
+Privalumai:
+
+Atsparus triukšmui (t.y. netvarkingiems duomenims),
+
+Gerai tvarkosi su nesubalansuotais duomenimis,
+
+Gana tikslus net ir be daug parametrų.
+
+🧠 Kodėl TF-IDF + Random Forest?
+TF-IDF leidžia naudoti natūralų tekstą be rankinio žodžių žymėjimo.
+
+Random Forest gerai apdoroja skaitinius duomenis iš TF-IDF ir yra nelabai jautrus netolygiems duomenų pasiskirstymams.
+
+Rezultatai geresni, bet aš ne tokių noriu:
+
+Modelio tikslumas: 0.29347826086956524
+
+  precision    recall  f1-score   support
+
+           Atakos / apsaugos konfliktas       1.00      0.33      0.50         3
+                      Bėglio konfliktas       0.00      0.00      0.00         1
+         Gijimo fazės / gijimo procesai       1.00      0.17      0.29         6
+                 Išsiskyrimo konfliktas       0.44      0.35      0.39        20
+                                   Kiti       0.08      0.09      0.09        11
+                 Kombinuotas konfliktas       0.00      0.00      0.00         2
+           Kvapo / jutiminis konfliktas       0.00      0.00      0.00         2
+               Kūno 'kąsnio' konfliktas       0.21      0.30      0.25        10
+              Mirties baimės konfliktas       0.67      0.29      0.40         7
+                   Motorinis konfliktas       0.00      0.00      0.00         1
+       Savigarbos sumažėjimo konfliktas       0.26      0.73      0.39        15
+                 Seksualinis konfliktas       0.00      0.00      0.00         2
+Sensorinis / regos / klausos konfliktas       0.00      0.00      0.00         7
+ Streso / greičio / spaudimo konfliktas       0.00      0.00      0.00         1
+           Šeimos / santykių konfliktas       0.33      0.25      0.29         4
+
+                               accuracy                           0.29        92
+                              macro avg       0.27      0.17      0.17        92
+                           weighted avg       0.33      0.29      0.26        92
+
+
+Prognozuojamas konfliktas: Savigarbos sumažėjimo konfliktas
+
+kadangi neenkina nei rezultatai, bet ir pati esme mano darbo ne tokia, as noriu kad žmogus ivedes ne tai kad gautu konflikto pavadinima,
+ o didesni aprasyma ir interpretacija kur galima butu konkreciau paziureti i savo gyvenima, kad vienokio ar kitokio simptomo neliktu.
+
+Todel bandau LLM, kadangi transformers netinka su mano python 3.12 versija, tai darau 65 bandyma su google colab
+bandziau modeli T5-small (modelio_treniravimas2.py_neveikia)
+
+Pradzioje visai negeneravo ismetamo teksto, duomenu kol kas naudojau tik 100 eiluciu tai manau stipriai per mazai,
+ bet norejau isbandyti ar is viso veikia.
+
+Po bandymo su 100 epochu
+
+Train loss: nuo 5.82 → iki 1.38
+
+Val loss: nuo 4.57 → iki 1.84
+
+Abu stabiliai mažėjo ir pasiekė žemą reikšmę, o pabaigoje nebuvo stipraus šokinėjimo.
+
+Isbandziau kelias ivestis: simptomas: insultas. žmogų ištiko insultas po skyrybų.
+Atsakymas : Integritas mog itiko itiko itiko insultas po skyryb. Tai gali bti susij su emocin insultas.
+Atsakymas: Atlas emocinio itiko insultas pokyiai itiko itiko insultas. Tai svario konflikto dl tai susij su 'bjas' ypa svarvaro kaip - kai mog  'bja' insultas.
+Atsakymas:  Sugeneruota išvestis: mog itiko insultas po skyryb mog itiko insultas. Tai insultas - tai mog itiko gijimo faz po mog.
+mog itiko insultas po skyryb mog itiko insultas. Tai insultas - tai mog itiko gijimo faz po mog.
+
+Kad sumazintu pasikartojimus output_ids pridedu repetition_penalty=2.5 
+Atsakymas: mog itiko insultas po skyrybimu. Tai insultacimou svarvard interesu,
+ kad fresco gali bti susij su nenoru pasireikio danikumo konflikto del reakcija innovativistu!
+
+ Suprantu kad negeneruoja lietuvisku raidziu atsakymuose, keiciu modeli i mt5-small
+
+ pakeitus generuoja:
+Įvestis: Simptomas: skausmas nugaroje.
+Situacija: Vyras patiria ilgalaikę įtampą darbe
+Klausimas: Paaiškink pagal GNM.
+Išvestis: <extra_id_0>NM.reiškia susisą su GNM tai paios ar būt u atsimuisti po, galiti
+<extra_id_0>NM.reiškia susisą su GNM tai paios ar būt u atsimuisti po, galiti
+
+Sakyčiau pirmasis T5 geriau generavo, bet be lietuviškų simbolių
+
+Visgi pavyko paskui paleisti ant vizualCode T5 modelį gauti rezultatai su 100eiluciu duomenu, 3 epochom, output_ids = model.generate(input_ids, max_length=128),
+ tokie:
+
+
+12/12 [==============================] - 148s 8s/step - loss: 6.0446 - val_loss: 4.7062
+Epoch 2/3
+12/12 [==============================] - 84s 7s/step - loss: 4.7006 - val_loss: 3.8913
+Epoch 3/3
+12/12 [==============================] - 70s 6s/step - loss: 4.0641 - val_loss: 3.6963
+Įvestis: po ilgų metų spaudimo darbe, vyras sako, kad 'viską daro iš inercijos'. tyrimai parodė neaktyvią hipofizės adenomą
+✅ Tikras atsakymas: Neaktyvi adenoma GNM požiūriu siejama su bendra emocine našta, spaudimu ir jėgų stygiumi. Simptomai priklauso nuo dydžio - dažnai būna galvos skausmas, spaudi
+mo jausmas
+🧠 Modelio atsakymas: tyrimai parod neaktyvi hipofizs adenoms adenoms adenoms adenoms adenoms adenoms adenoms adenoms adenoms adenoms adenoms adenoms adenoms adenoms adenoms     
+
+🔹 Įvestis: po ilgo informacinio chaoso žmogus sako, kad nebenori girdėti ir matyti nieko daugiau. tyrimuose matomas nelygus vyzdžio kraštas
+✅ Tikras atsakymas: Vyzdžio deformacijos gali rodyti nenorą matyti tam tikrą informaciją. GNM vertina tai kaip psichikos-smegenų reakciją į nepageidaujamą realybę.
+🧠 Modelio atsakymas:
+
+🔹 Įvestis: po to, kai nuolat buvo kritikuojama dėl kalbėjimo tono, moteris pradėjo vengti klausytis kitų. diagnozuotas ausies nervo navikas.
+✅ Tikras atsakymas: Pagal GNM, ausies nervo navikas gali būti susijęs su skausmingu klausymosi konfliktu - kai žmogus išgyvena priekaištus ar žodžius, kurių nenori girdėti. Gali 
+pasireikšti kurtumu ar svaigimu
+🧠 Modelio atsakymas:
+
+Bandau toliau:
+jau turiu suvedusi 240 eiluciu tai padidinu, epochų padarau 3, bet keiciau visa diena kad is vis paleisti nes buvo nesuderintos versijos.
+Pavyko paleisti, bet rezultata sudina gavau:
+ Įvestis: po viešo konflikto studentas jaučiasi morališkai pažemintas ir protiškai nuvertintas. po kelių dienų jam diagnozuotas meningitas.
+✅ Tikras atsakymas: Meningitas pagal GNM gali atsirasti kaip moralinio arba intelektualinio nuvertinimo konflikto pasekmė. Simptomai sustiprėja, jei yra genetinė
+ ar sindrominė predispozicija.
+🧠 Modelio atsakymas:
+
+🔹 Įvestis: po nesėkmės versle vyras jaučiasi bevertis ir sugniuždytas. naujausi kraujo tyrimai parodė mažesnį hemoglobino kiekį.
+✅ Tikras atsakymas: Pagal GNM, mažesnis hemoglobino kiekis gali rodyti aktyvią savigarbos sumažėjimo fazę, kai žmogus jaučiasi nepajėgus arba nevertingas. Jei da
+r pasireiškia kraujavimas, tai taip pat gali veikti hemoglobino lygį. Konflikto sprendimo atveju rodikliai gali vėl pradėti kilti.
+🧠 Modelio atsakymas:
+
+🔹 Įvestis: vyras nuolat jaučiasi kaltinamas, kad nieko nepadaro pakankamai greitai. jam padidėjęs prakaitavimas, dirglumas.
+✅ Tikras atsakymas: Hipertireozė susijusi su sumažintos savivertės konfliktu, ypač kai žmogų nuolat kritikuoja dėl greičio ar efektyvumo. GNM vertina tai kaip re
+akciją į nuolatinį 'greičio' spaudimą
+🧠 Modelio atsakymas: kad nieko nepadaro pakankamai greitai. kad padidjs prakaitavimas, dirglumas.
+
+Modelis tik mokosi kopijuoti arba nesupranta, ką reikia daryti, nes:
+
+Netinkamai pateikta labels reikšmė (dažnas klaidos šaltinis T5 su TensorFlow).
+
+T5 modeliai reikalauja tikslaus decoder_input_ids nurodymo mokymo metu (čia gali būti problema).
+
+Gali trūkti tinkamo DataCollatorForSeq2Seq naudojimo (kuris automatiškai paruošia tinkamas įvestis su dekoderiu).
+
+Gali būti per mažai treniravimo epochų arba duomenys per maži kiekiu – jis dar nespėjo nieko išmokti.
+
+Kol kas nieko nekeiciu tik epochas padidinsiu iki 10
+
+🔹 Įvestis: po viešo konflikto studentas jaučiasi morališkai pažemintas ir protiškai nuvertintas. po kelių dienų jam diagnozuotas meningitas.
+✅ Tikras atsakymas: Meningitas pagal GNM gali atsirasti kaip moralinio arba intelektualinio nuvertinimo konflikto pasekmė. Simptomai sustiprėja, jei yra genetinė
+ ar sindrominė predispozicija.
+🧠 Modelio atsakymas:
+
+🔹 Įvestis: po nesėkmės versle vyras jaučiasi bevertis ir sugniuždytas. naujausi kraujo tyrimai parodė mažesnį hemoglobino kiekį.
+✅ Tikras atsakymas: Pagal GNM, mažesnis hemoglobino kiekis gali rodyti aktyvią savigarbos sumažėjimo fazę, kai žmogus jaučiasi nepajėgus arba nevertingas. Jei da
+r pasireiškia kraujavimas, tai taip pat gali veikti hemoglobino lygį. Konflikto sprendimo atveju rodikliai gali vėl pradėti kilti.
+🧠 Modelio atsakymas:
+
+🔹 Įvestis: vyras nuolat jaučiasi kaltinamas, kad nieko nepadaro pakankamai greitai. jam padidėjęs prakaitavimas, dirglumas.
+✅ Tikras atsakymas: Hipertireozė susijusi su sumažintos savivertės konfliktu, ypač kai žmogų nuolat kritikuoja dėl greičio ar efektyvumo. GNM vertina tai kaip re
+akciją į nuolatinį 'greičio' spaudimą
+🧠 Modelio atsakymas:
+
+Jokio atsakymo nemeta visai
+
+Sugalvojau pabandyti ant savo turimu 240eiluciu duomenu patikrinti ant istreniruoto ant lietuviško teksto modelio, treniravau turbut 20epochų 
+4 val ant savo kompo, bet modelio atsakymai nustebimo:
+
+Įvestis: simptomas: meningitas. po viešo konflikto studentas jaučiasi morališkai pažemintas ir protiškai nuvertintas. po kelių dienų jam diagnozuotas meningitas.
+✅ Tikras atsakymas: Meningitas pagal GNM gali atsirasti kaip moralinio arba intelektualinio nuvertinimo konflikto pasekmė. Simptomai sustiprėja, jei yra genetinė ar sindrominė pr
+edispozicija.
+🧠 Modelio atsakymas: Pagal GNM, meningitas po viešo konflikto gali būti susijęs su morališkai pažemintu ar protiškai nuvertintu konfliktu. Tai reiškia, kad žmogus gali jausti emocinį diskomfortą.
+
+🔹 Įvestis: simptomas: hemoglobino kiekio pakitimai. po nesėkmės versle vyras jaučiasi bevertis ir sugniuždytas. naujausi kraujo tyrimai parodė mažesnį hemoglobino kiekį.
+✅ Tikras atsakymas: Pagal GNM, mažesnis hemoglobino kiekis gali rodyti aktyvią savigarbos sumažėjimo fazę, kai žmogus jaučiasi nepajėgus arba nevertingas. Jei dar pasireiškia kra
+ujavimas, tai taip pat gali veikti hemoglobino lygį. Konflikto sprendimo atveju rodikliai gali vėl pradėti kilti.
+🧠 Modelio atsakymas: Pagal GNM, hemoglobino kiekio pakitimai po nesėkmės versle gali būti susiję su sugniuždytu konfliktu.
+
+🔹 Įvestis: simptomas: hipertireozė. vyras nuolat jaučiasi kaltinamas, kad nieko nepadaro pakankamai greitai. jam padidėjęs prakaitavimas, dirglumas.
+✅ Tikras atsakymas: Hipertireozė susijusi su sumažintos savivertės konfliktu, ypač kai žmogų nuolat kritikuoja dėl greičio ar efektyvumo. GNM vertina tai kaip reakciją į nuolatin
+į 'greičio' spaudimą
+🧠 Modelio atsakymas: Pagal GNM, hipertireozė gali būti susijusi su padidėjusiu prakaitavimu, dirglumu ir fiziniu krūviu.
+ Tai reiškia, kad padidėjęs prakaitavimas gali sukelti emocinį diskomfortą.
+
+ Ne visi atsakymai sąmoningi, bet jau normaliai bent sakinius generuoja. Treniravimo kreivė matosi grafike T5_treniravimo grafikas
+
