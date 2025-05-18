@@ -33,8 +33,8 @@ test_dataset = Dataset.from_pandas(test_df.reset_index(drop=True))
 tokenizer = T5Tokenizer.from_pretrained("t5-small")
 
 def tokenize_function(example):
-    input_enc = tokenizer(example["input"], padding="max_length", truncation=True, max_length=128)
-    output_enc = tokenizer(example["target"], padding="max_length", truncation=True, max_length=128)
+    input_enc = tokenizer(example["input"], padding="max_length", truncation=True, max_length=64)
+    output_enc = tokenizer(example["target"], padding="max_length", truncation=True, max_length=64)
     input_enc["labels"] = output_enc["input_ids"]
     return input_enc
 
@@ -47,18 +47,18 @@ data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model, return_
 
 train_set = train_tokenized.to_tf_dataset(
     shuffle=True,
-    batch_size=8,
+    batch_size=4,
     collate_fn=data_collator
 )
 
 val_set = test_tokenized.to_tf_dataset(
     shuffle=False,
-    batch_size=8,
+    batch_size=4,
     collate_fn=data_collator
 )
 
 model.compile(
-    optimizer=Adam(learning_rate=5e-5),
+    optimizer=Adam(learning_rate=3e-4),
     loss=SparseCategoricalCrossentropy(from_logits=True)
 )
 
@@ -68,12 +68,12 @@ history = model.fit(
     epochs=20
     )
 
-model.save_pretrained("gnm-t5")
-tokenizer.save_pretrained("gnm-t5")
+model.save_pretrained("trained_models/gnm-t5-variant2")
+tokenizer.save_pretrained("trained_models/gnm-t5-variant2")
 
 data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model, return_tensors="tf")
 
-print("\n🧪 Testuojame modelį su keliomis ivestimis:\n")
+print("\nTestuojame modelį su keliomis ivestimis:\n")
 for i in range(3):
     tekstas = test_df.iloc[i]["input"]
     tikras = test_df.iloc[i]["target"]

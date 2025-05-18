@@ -265,3 +265,64 @@ ujavimas, tai taip pat gali veikti hemoglobino lygį. Konflikto sprendimo atveju
 
  Ne visi atsakymai sąmoningi, bet jau normaliai bent sakinius generuoja. Treniravimo kreivė matosi grafike T5_treniravimo grafikas
 
+Modelis: gnm-t5-kitas-1var
+Data: 2025-05-15
+Naudotas modelis: LukasStankevicius/t5-base-lithuanian-news-summaries-175
+Duomenys: tik excel įrašai
+
+
+Modelis: gnm-t5-2var
+Data: 2025-05-18
+Naudotas modelis: TF_model.h5
+Duomenys: tik excel įrašai
+
+max_length 128
+batch_size 8
+Epoch 20
+lerning_rate 5e-5
+
+Testas:
+Įvestis: simptomas: meningitas. po viešo konflikto studentas jaučiasi morališkai pažemintas ir protiškai nuvertintas. po kelių dienų jam diagnozuotas meningitas.
+✅ Tikras atsakymas: Meningitas pagal GNM gali atsirasti kaip moralinio arba intelektualinio nuvertinimo konflikto pasekmė. Simptomai sustiprėja, jei yra genetinė
+ ar sindrominė predispozicija.
+🧠 Modelio atsakymas: Meningitas gali bti susijs su kstystys iti iti iti iti iti iti iti iti iti iti iti iti iti iti iti iti iti ks - ko i
+
+🔹 Įvestis: simptomas: hemoglobino kiekio pakitimai. po nesėkmės versle vyras jaučiasi bevertis ir sugniuždytas. naujausi kraujo tyrimai parodė mažesnį hemoglobino kiekį.
+✅ Tikras atsakymas: Pagal GNM, mažesnis hemoglobino kiekis gali rodyti aktyvią savigarbos sumažėjimo fazę, kai žmogus jaučiasi nepajėgus arba nevertingas. Jei da
+r pasireiškia kraujavimas, tai taip pat gali veikti hemoglobino lygį. Konflikto sprendimo atveju rodikliai gali vėl pradėti kilti.
+🧠 Modelio atsakymas: Pagal GNM, hemoglobino kiekio pakitimai - kai mogus - kai mogus ir mogus ir mogus ir mogus ir mogus ir mogus mogus. Pagal GNM, mogus ir mogus ir mogus mogus mogus mogus esiias kraujo krau
+
+🔹 Įvestis: simptomas: hipertireozė. vyras nuolat jaučiasi kaltinamas, kad nieko nepadaro pakankamai greitai. jam padidėjęs prakaitavimas, dirglumas.
+✅ Tikras atsakymas: Hipertireozė susijusi su sumažintos savivertės konfliktu, ypač kai žmogų nuolat kritikuoja dėl greičio ar efektyvumo. GNM vertina tai kaip re
+akciją į nuolatinį 'greičio' spaudimą
+🧠 Modelio atsakymas: Tai savs  tai                                                   emocins  t
+
+O grafikas: T5-small_var2.png
+_______________________________________________________
+Modelis: gnm-t5-3var
+Data: 2025-05-18
+Naudotas modelis: TF_model.h5
+Duomenys: tik excel įrašai
+
+max_length 64
+batch_size 4
+Epoch 20
+lerning_rate 3e-4
+
+Įvestis: simptomas: meningitas. po viešo konflikto studentas jaučiasi morališkai pažemintas ir protiškai nuvertintas. po kelių dienų jam diagnozuotas meningitas.
+✅ Tikras atsakymas: Meningitas pagal GNM gali atsirasti kaip moralinio arba intelektualinio nuvertinimo konflikto pasekmė. Simptomai sustiprėja, jei yra genetinė
+ ar sindrominė predispozicija.
+🧠 Modelio atsakymas: Meningitas gali bti susijs su saviverts sumajimo konfliktu - danai dl nepavykusio siejama su saviverts. Tai savigarbos
+
+🔹 Įvestis: simptomas: hemoglobino kiekio pakitimai. po nesėkmės versle vyras jaučiasi bevertis ir sugniuždytas. naujausi kraujo tyrimai parodė mažesnį hemoglobino kiekį.
+✅ Tikras atsakymas: Pagal GNM, mažesnis hemoglobino kiekis gali rodyti aktyvią savigarbos sumažėjimo fazę, kai žmogus jaučiasi nepajėgus arba nevertingas. Jei da
+r pasireiškia kraujavimas, tai taip pat gali veikti hemoglobino lygį. Konflikto sprendimo atveju rodikliai gali vėl pradėti kilti.
+🧠 Modelio atsakymas: Pagal GNM, tai konfliktas dl neskms versle vyra susijs su saviverts sumajimo arba neskms sumajimo. Tai gali bti
+
+🔹 Įvestis: simptomas: hipertireozė. vyras nuolat jaučiasi kaltinamas, kad nieko nepadaro pakankamai greitai. jam padidėjęs prakaitavimas, dirglumas.
+✅ Tikras atsakymas: Hipertireozė susijusi su sumažintos savivertės konfliktu, ypač kai žmogų nuolat kritikuoja dėl greičio ar efektyvumo. GNM vertina tai kaip re
+akciją į nuolatinį 'greičio' spaudimą
+🧠 Modelio atsakymas: Pagal GNM, hipertireoz gali bti susijusi su saviverts nuolat jausmu, kai greitai greitai kaip greitai. Tai gilus savigarbos
+
+O grafikas: T5-small_var3.png
+_______________________________________________________

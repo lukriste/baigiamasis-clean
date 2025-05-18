@@ -172,9 +172,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-# Ignoruoti viską iš gnm-t5, bet palikti galimybę pridėti README jei reikia
-gnm-t5/
-!gnm-t5/README.md
+# Išsaugoti modeliai
+trained_models/
 
 # Dar kiti failai
 *.csv
