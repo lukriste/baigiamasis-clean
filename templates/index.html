@@ -7,10 +7,14 @@
 <body>
     <h1>Įveskite klausimą ar tekstą</h1>
     <form method="POST">
-         <input type="text" name="simptomas" required>
-         <textarea name="ivestis" required></textarea>
-         <button type="submit">Siųsti</button>
-    </form>
+    <label>Simptomas:</label><br>
+    <input type="text" name="simptomas" required><br><br>
+
+    <label>Situacija (nebūtina):</label><br>
+    <textarea name="ivestis" rows="4" cols="50" placeholder="(jei nori, aprašyk situaciją)"></textarea><br><br>
+
+    <button type="submit">Gauti atsakymą</button>
+</form>
 
     {% if atsakymas %}
         <h2>AI atsakymas:</h2>

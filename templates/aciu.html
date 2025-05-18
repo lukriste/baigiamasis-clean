@@ -1,10 +1,18 @@
 <!DOCTYPE html>
-<html lang="lt">
-<head><title>Ačiū</title></head>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Ačiū</title>
+</head>
 <body>
     <h1>Ačiū!</h1>
-    <p>Modelio atsakymas:</p>
-    <p>{{ atsakymas }}</p>
+
+    <h3>AI sugeneruotas atsakymas:</h3>
+    <p>{{ atsakymas_ai }}</p>
+
+    <h3>Rankinis (GNM) atsakymas iš duomenų bazės:</h3>
+    <p>{{ atsakymas_db }}</p>
+
     <a href="/">Grįžti atgal</a>
 </body>
 </html>
