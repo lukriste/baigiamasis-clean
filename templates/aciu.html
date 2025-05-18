@@ -1,18 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="lt">
 <head>
     <meta charset="UTF-8">
-    <title>Ačiū</title>
+    <title>Ačiū!</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .atsakymas-blokas {
+            background-color: #f0f4f8;
+            padding: 15px;
+            border-left: 4px solid #007acc;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .atsakymas-blokas h2 {
+            margin-top: 0;
+            color: #007acc;
+        }
+        .patikimumas {
+            font-style: italic;
+            color: #444;
+        }
+        fieldset {
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        legend {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <h1>Ačiū!</h1>
+    <h1>Ačiū už pateiktą informaciją!</h1>
 
-    <h3>AI sugeneruotas atsakymas:</h3>
-    <p>{{ atsakymas_ai }}</p>
+    <div class="atsakymas-blokas">
+        <h2>Rankinis (GNM) atsakymas iš duomenų bazės:</h2>
+        <p>{{ atsakymas_db }}</p>
+    </div>
 
-    <h3>Rankinis (GNM) atsakymas iš duomenų bazės:</h3>
-    <p>{{ atsakymas_db }}</p>
+    <div class="atsakymas-blokas">
+        <h2>AI atsakymas:</h2>
+        <p>{{ atsakymas_ai }}</p>
 
-    <a href="/">Grįžti atgal</a>
+        <form method="POST" action="/ivertinti">
+            <fieldset>
+                <legend>Ar šis AI atsakymas buvo naudingas?</legend>
+                <label>
+                    <input type="radio" name="ivertinimas" value="teigiamas" required> Taip
+                </label><br>
+                <label>
+                    <input type="radio" name="ivertinimas" value="neigiamas"> Ne
+                </label><br>
+                <input type="hidden" name="simptomas" value="{{ simptomas }}">
+                <button type="submit">Pateikti įvertinimą</button>
+            </fieldset>
+        </form>
+    </div>
+
+    <div class="atsakymas-blokas">
+        <h3>Pavyzdinė situacija (pagal AI atsakymą):</h3>
+        <p>{{ situacija }}</p>
+        <p class="patikimumas">{{ atsakymo_patikimumas }}</p>
+    </div>
+
+    <a href="/">Grįžti į pradžią</a>
 </body>
 </html>

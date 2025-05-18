@@ -2,23 +2,60 @@
 <html lang="lt">
 <head>
     <meta charset="UTF-8">
-    <title>AI Atsakymas</title>
+    <title>Simptomo analizė</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+function tikrintiAmziu(el) {
+    const klaida = document.getElementById("amzius-klaida");
+    const verte = parseInt(el.value);
+    if (el.value === "") {
+        klaida.textContent = "";
+        return;
+    }
+    if (isNaN(verte) || verte < 1 || verte > 110) {
+        klaida.textContent = "Neteisingai įvestas amžius!";
+        el.setCustomValidity("Neteisingai įvestas amžius!");
+    } else {
+        klaida.textContent = "";
+        el.setCustomValidity("");  // pašalina klaidą
+    }
+}
+</script>
 </head>
 <body>
-    <h1>Įveskite klausimą ar tekstą</h1>
+    <h1>GNM simptomų analizė</h1>
+
     <form method="POST">
-    <label>Simptomas:</label><br>
-    <input type="text" name="simptomas" required><br><br>
+        <label for="simptomas"><strong>Pasirinkite simptomą:</strong></label><br>
+        <select name="simptomas" required>
+            <option value="">-- Pasirinkite simptomą --</option>
+            {% for s in simptomai %}
+                <option value="{{ s }}">{{ s }}</option>
+            {% endfor %}
+        </select><br><br>
 
-    <label>Situacija (nebūtina):</label><br>
-    <textarea name="ivestis" rows="4" cols="50" placeholder="(jei nori, aprašyk situaciją)"></textarea><br><br>
+        <label><strong>Kiek jums metų?</strong></label><br>
+        <input type="number" name="amzius" required min="1" max="100" oninput="tikrintiAmziu(this)"><br><br>
+        <span id="amzius-klaida" class="klaida"></span>
 
-    <button type="submit">Gauti atsakymą</button>
-</form>
+        <label><strong>Lytis:</strong></label><br>
+        <select name="lytis">
+            <option value="">-- Pasirinkite --</option>
+            <option value="vyras">Vyras</option>
+            <option value="moteris">Moteris</option>
+        </select><br><br>
 
-    {% if atsakymas %}
-        <h2>AI atsakymas:</h2>
-        <p>{{ atsakymas }}</p>
-    {% endif %}
+        <label><strong>Simptomai atsirado staiga ar palaipsniui?</strong></label><br>
+        <select name="simptomo atsiradimas">
+            <option value="">-- Pasirinkite --</option>
+            <option value="staiga">Staiga</option>
+            <option value="palaipsniui">Palaipsniui</option>
+        </select><br><br>
+
+        <label for="ivestis"><strong>Kas nutiko prieš atsirandant simptomui?</strong></label><br>
+        <textarea name="ivestis" rows="4" cols="50" placeholder="Tai gali būti tiek teigiamas tiek neigiamas emocijas keliantis įvykis, pokalbis, stresas, pokytis ir pan. "></textarea><br><br>
+
+        <button type="submit">Gauti atsakymą</button>
+    </form>
 </body>
 </html>

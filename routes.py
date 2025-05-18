@@ -1,61 +1,77 @@
-from rapidfuzz import fuzz
 from flask import render_template, request, redirect, session
 from extensions import db
 from models import Simptomas
-from scripts.model_helpers import gauti_modelio_atsakyma
-
+from scripts.model_helpers import gauti_modelio_atsakyma, irasyti_uzklausa, gauti_teisinga_atsakyma_pagal_simptoma,gauti_pavyzdine_situacija_ir_vertinimas,ivertinti_atsakyma, suformuoti_situacija
 
 def setup_routes(app):
     @app.route("/", methods=["GET", "POST"])
     def index():
+        visi_simptomai = db.session.query(Simptomas.simptomas).filter_by(saltinis="excel").distinct().all()
+        simptomu_sarasas = sorted(set(s[0].strip().lower() for s in visi_simptomai if s[0]))
         if request.method == "POST":
             simptomas = request.form.get("simptomas", "").strip()
-            ivestis = request.form.get("ivestis", "").strip()
+            amzius = request.form.get("amzius", "").strip()
+            lytis = request.form.get("lytis", "").strip().lower()
+
+            klaidos = []
 
             if not simptomas:
-                return "Prašome įvesti bent simptomą!", 400
+                klaidos.append("Prašome pasirinkti simptomą.")
 
-            # AI modelio atsakymas
+            try:
+                amzius_int = int(amzius)
+                if not 1 <= amzius_int <= 110:
+                    klaidos.append("Amžius turi būti tarp 1 ir 110.")
+            except ValueError:
+                klaidos.append("Amžius turi būti skaičius.")
+
+            if lytis not in ("vyras", "moteris"):
+                klaidos.append("Pasirinkite tinkamą lytį.")
+
+            if klaidos:
+                return render_template("index.html", simptomai=simptomu_sarasas, klaidos=klaidos)
+
+            ivestis = suformuoti_situacija(request.form)
+            # AI atsakymas
             isvestis_ai = gauti_modelio_atsakyma(simptomas, ivestis)
 
-            # Paieška duomenų bazėje – rankinis atsakymas, jei yra
-            # Gauti visus „rankinius“ įrašus
-            visi_excel_simptomai = Simptomas.query.filter_by(saltinis='excel').all()
+            # Rankinis atsakymas iš DB
+            teisingas_atsakymas = gauti_teisinga_atsakyma_pagal_simptoma(simptomas)
 
-            geriausias = None
-            geriausias_sutapimas = 0
+            # Situacijos pavyzdys iš DB pagal AI atsakymą
+            situacija, patikimumas, _ = gauti_pavyzdine_situacija_ir_vertinimas(isvestis_ai)
 
-            for irasas in visi_excel_simptomai:
-                sutapimas = fuzz.token_set_ratio(irasas.simptomas, simptomas.lower())
-                
-                if sutapimas > geriausias_sutapimas:
-                    geriausias_sutapimas = sutapimas
-                    geriausias = irasas
+            # Įrašas į DB
+            irasyti_uzklausa(simptomas, ivestis, isvestis_ai)
 
-                if geriausias and geriausias_sutapimas >= 60:
-                    teisingas_atsakymas = geriausias.isvestis
-                else:
-                    teisingas_atsakymas = "🟡 Atsakymas bazėje nerastas."
-
-            # Įrašyti į DB vartotojo įrašą
-            naujas = Simptomas(
-                simptomas=simptomas.lower(),
-                ivestis=ivestis or None,
-                isvestis=isvestis_ai,
-                saltinis="vartotojas"
-            )
-            db.session.add(naujas)
-            db.session.commit()
-
-            # Siunčiam info į 'aciu.html'
+            # Į sesiją
+            session["simptomas"] = simptomas
             session["ai_atsakymas"] = isvestis_ai
             session["db_atsakymas"] = teisingas_atsakymas
+            session["situacijos_pavyzdys"] = situacija
+            session["atsakymo_patikimumas"] = patikimumas
+            
+
             return redirect("/aciu")
-    
-        return render_template("index.html")
+
+        return render_template("index.html", simptomai=simptomu_sarasas)
 
     @app.route("/aciu")
     def aciu():
-        ai = session.get("ai_atsakymas", "Nepavyko gauti AI atsakymo.")
-        db = session.get("db_atsakymas", "Nepavyko gauti teisingo atsakymo iš duomenų bazės.")
-        return render_template("aciu.html", atsakymas_ai=ai, atsakymas_db=db)
+        return render_template("aciu.html",
+            atsakymas_ai=session.get("ai_atsakymas", ""),
+            atsakymas_db=session.get("db_atsakymas", ""),
+            situacija=session.get("situacijos_pavyzdys", ""),
+            atsakymo_patikimumas=session.get("atsakymo_patikimumas", ""),
+            simptomas=session.get("simptomas", "")
+        )
+
+    @app.route("/ivertinti", methods=["POST"])
+    def ivertinti():
+        simptomas = request.form.get("simptomas")
+        ivertinimas = request.form.get("ivertinimas")
+
+        if simptomas and ivertinimas:
+            ivertinti_atsakyma(simptomas, ivertinimas)
+
+        return redirect("/")
