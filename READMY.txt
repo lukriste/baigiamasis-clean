@@ -326,3 +326,12 @@ akciją į nuolatinį 'greičio' spaudimą
 
 O grafikas: T5-small_var3.png
 _______________________________________________________
+Modelis: gnm-t5-liet-2var
+Data: 2025-05-19
+Naudotas modelis: TF_model.h5
+Duomenys: tik excel įrašai
+
+max_length 128
+batch_size 4
+Epoch 20
+lerning_rate 5e-5

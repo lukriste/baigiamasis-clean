@@ -4,32 +4,7 @@
     <meta charset="UTF-8">
     <title>Ačiū!</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <style>
-        .atsakymas-blokas {
-            background-color: #f0f4f8;
-            padding: 15px;
-            border-left: 4px solid #007acc;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
-        .atsakymas-blokas h2 {
-            margin-top: 0;
-            color: #007acc;
-        }
-        .patikimumas {
-            font-style: italic;
-            color: #444;
-        }
-        fieldset {
-            border: 1px solid #ccc;
-            padding: 15px;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-        legend {
-            font-weight: bold;
-        }
-    </style>
+
 </head>
 <body>
     <h1>Ačiū už pateiktą informaciją!</h1>
@@ -61,7 +36,7 @@
     <div class="atsakymas-blokas">
         <h3>Pavyzdinė situacija (pagal AI atsakymą):</h3>
         <p>{{ situacija }}</p>
-        <p class="patikimumas">{{ atsakymo_patikimumas }}</p>
+        
     </div>
 
     <a href="/">Grįžti į pradžią</a>

@@ -68,8 +68,8 @@ history = model.fit(
     epochs=20
     )
 
-model.save_pretrained("gnm-t5")
-tokenizer.save_pretrained("gnm-t5")
+model.save_pretrained("trained_models/gnm-t5-liet-var2")
+tokenizer.save_pretrained("trained_models/gnm-t5-liet-var2")
 
 data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model, return_tensors="tf")
 

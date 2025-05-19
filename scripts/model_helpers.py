@@ -1,11 +1,15 @@
+import csv
+import os
+from datetime import datetime
 from transformers import TFAutoModelForSeq2SeqLM, T5Tokenizer
 import tensorflow as tf
 from models import Simptomas
 from extensions import db
 from rapidfuzz import fuzz
+import evaluate
 # Įkeliame išsaugotą modelį
-model = TFAutoModelForSeq2SeqLM.from_pretrained("gnm-t5")
-tokenizer = T5Tokenizer.from_pretrained("gnm-t5")
+model = TFAutoModelForSeq2SeqLM.from_pretrained("trained_models/gnm-t5-liet-var2")
+tokenizer = T5Tokenizer.from_pretrained("trained_models/gnm-t5-liet-var2")
 
 def gauti_modelio_atsakyma(simptomas: str, ivestis: str) -> str:
     if not simptomas:
@@ -77,3 +81,45 @@ def suformuoti_situacija(form):
         f"pajuto simptomą. Prieš tai nutiko: {form.get('ivestis', '')}. "
         f"Emociškai įvykis įvertintas kaip {form.get('emocija', 'nežinoma')} patirtis."
     )
+
+def irasyti_ivertinima_i_csv(simptomas, ivestis, modelio_ats, tikras_ats, rouge_score, bleu_score):
+    laukai = ["timestamp", "simptomas", "ivestis", "modelio_ats", "tikras_ats", "rouge", "bleu"]
+    eilute = {
+        "timestamp": datetime.now().isoformat(),
+        "simptomas": simptomas,
+        "ivestis": ivestis,
+        "modelio_ats": modelio_ats,
+        "tikras_ats": tikras_ats,
+        "rouge": round(rouge_score, 4) if rouge_score is not None else None,
+        "bleu": round(bleu_score, 4) if bleu_score is not None else None
+    }
+
+    failo_pavadinimas = "data/vertinimo_metrikos.csv"  
+    failas_egzistuoja = os.path.isfile(failo_pavadinimas)
+
+    with open(failo_pavadinimas, mode="a", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=laukai)
+        if not failas_egzistuoja:
+            writer.writeheader()
+        writer.writerow(eilute)
+
+rouge_metric = evaluate.load("rouge")
+bleu_metric = evaluate.load("bleu")
+
+def ivertinti_atsakyma_automatiniskai(modelio_ats: str, tikras_ats: str):
+    try:
+        # ROUGE (naudojam ROUGE-L)
+        rouge = rouge_metric.compute(predictions=[modelio_ats], references=[tikras_ats])
+        rouge_score = rouge["rougeL"]
+
+        # BLEU (tekstų palyginimas, ne split'ai!)
+        bleu = bleu_metric.compute(
+            predictions=[modelio_ats],
+            references=[tikras_ats]
+        )
+        bleu_score = bleu["bleu"]
+
+        return rouge_score, bleu_score
+    except Exception as e:
+        print(f"Klaida skaičiuojant metrikas: {str(e)}")
+        return None, None

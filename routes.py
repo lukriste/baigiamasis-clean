@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, session
 from extensions import db
 from models import Simptomas
-from scripts.model_helpers import gauti_modelio_atsakyma, irasyti_uzklausa, gauti_teisinga_atsakyma_pagal_simptoma,gauti_pavyzdine_situacija_ir_vertinimas,ivertinti_atsakyma, suformuoti_situacija
+from scripts.model_helpers import gauti_modelio_atsakyma, irasyti_uzklausa, gauti_teisinga_atsakyma_pagal_simptoma,gauti_pavyzdine_situacija_ir_vertinimas,ivertinti_atsakyma, suformuoti_situacija, irasyti_ivertinima_i_csv, ivertinti_atsakyma_automatiniskai
 
 def setup_routes(app):
     @app.route("/", methods=["GET", "POST"])
@@ -51,6 +51,16 @@ def setup_routes(app):
             session["situacijos_pavyzdys"] = situacija
             session["atsakymo_patikimumas"] = patikimumas
             
+            rouge_score, bleu_score = ivertinti_atsakyma_automatiniskai(isvestis_ai, teisingas_atsakymas)
+
+            irasyti_ivertinima_i_csv(
+                simptomas=simptomas,
+                ivestis=ivestis,
+                modelio_ats=isvestis_ai,
+                tikras_ats=teisingas_atsakymas,
+                rouge_score=rouge_score,
+                bleu_score=bleu_score
+            )
 
             return redirect("/aciu")
 
