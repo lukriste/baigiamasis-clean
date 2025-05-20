@@ -1,20 +1,30 @@
 from flask import render_template, request, redirect, session
 from extensions import db
 from models import Simptomas
-from scripts.model_helpers import gauti_modelio_atsakyma, irasyti_uzklausa, gauti_teisinga_atsakyma_pagal_simptoma,gauti_pavyzdine_situacija_ir_vertinimas,ivertinti_atsakyma, suformuoti_situacija, irasyti_ivertinima_i_csv, ivertinti_atsakyma_automatiniskai
+from scripts.model_helpers import gauti_modelio_atsakyma, irasyti_uzklausa, gauti_teisinga_atsakyma_pagal_simptoma,gauti_pavyzdine_situacija_ir_vertinimas,ivertinti_atsakyma, suformuoti_situacija, irasyti_ivertinima_i_csv, ivertinti_atsakyma_automatiniskai, rasti_artimiausia_simptoma
 
 def setup_routes(app):
     @app.route("/", methods=["GET", "POST"])
     def index():
         visi_simptomai = db.session.query(Simptomas.simptomas).filter_by(saltinis="excel").distinct().all()
         simptomu_sarasas = sorted(set(s[0].strip().lower() for s in visi_simptomai if s[0]))
+
+        klaidos = []
+        ivestis = ""
+        simptomas_is_saraso = ""
+        kitas_simptomas = ""
+        amzius = ""
+        lytis = ""
+
         if request.method == "POST":
-            simptomas = request.form.get("simptomas", "").strip()
+            simptomas_is_saraso = request.form.get("simptomas", "").strip()
+            kitas_simptomas = request.form.get("kitas_simptomas", "").strip()
             amzius = request.form.get("amzius", "").strip()
             lytis = request.form.get("lytis", "").strip().lower()
 
             klaidos = []
-
+            simptomas = kitas_simptomas if kitas_simptomas else simptomas_is_saraso
+            simptomas = rasti_artimiausia_simptoma(simptomas)
             if not simptomas:
                 klaidos.append("Prašome pasirinkti simptomą.")
 
@@ -64,7 +74,15 @@ def setup_routes(app):
 
             return redirect("/aciu")
 
-        return render_template("index.html", simptomai=simptomu_sarasas)
+        return render_template("index.html",
+                            simptomai=simptomu_sarasas,
+                            klaidos=klaidos,
+                            ivestis_pradinis=ivestis,
+                            pasirinktas_simptomas=simptomas_is_saraso,
+                            pasirinktas_kitas=kitas_simptomas,
+                            amzius=amzius,
+                            lytis=lytis
+                            )
 
     @app.route("/aciu")
     def aciu():

@@ -123,3 +123,21 @@ def ivertinti_atsakyma_automatiniskai(modelio_ats: str, tikras_ats: str):
     except Exception as e:
         print(f"Klaida skaičiuojant metrikas: {str(e)}")
         return None, None
+
+
+def rasti_artimiausia_simptoma(ivestas_simptomas, riba=70):
+    visi = Simptomas.query.filter_by(saltinis="excel").all()
+
+    geriausias = None
+    geriausias_sutapimas = 0
+
+    for irasas in visi:
+        panašumas = fuzz.token_set_ratio(ivestas_simptomas.lower(), irasas.simptomas.lower())
+        if panašumas > geriausias_sutapimas:
+            geriausias_sutapimas = panašumas
+            geriausias = irasas
+
+    if geriausias and geriausias_sutapimas >= riba:
+        return geriausias.simptomas
+    else:
+        return ivestas_simptomas
