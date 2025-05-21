@@ -11,7 +11,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from tensorflow.keras.optimizers.legacy import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
-from duomenu_tvarkymas import normalizuoti_teksta
+
 
 
 
@@ -30,7 +30,7 @@ train_df, test_df = train_test_split(data, test_size=0.1, random_state=42)
 train_dataset = Dataset.from_pandas(train_df.reset_index(drop=True))
 test_dataset = Dataset.from_pandas(test_df.reset_index(drop=True))
 
-tokenizer = T5Tokenizer.from_pretrained("t5-small")
+tokenizer = T5Tokenizer.from_pretrained("LukasStankevicius/t5-base-lithuanian-news-summaries-175")
 
 def tokenize_function(example):
     input_enc = tokenizer(example["input"], padding="max_length", truncation=True, max_length=128)
@@ -41,19 +41,19 @@ def tokenize_function(example):
 train_tokenized = train_dataset.map(tokenize_function, batched=False, remove_columns=["input", "target"])
 test_tokenized = test_dataset.map(tokenize_function, batched=False, remove_columns=["input", "target"])
 
-model = TFAutoModelForSeq2SeqLM.from_pretrained("t5-small")
+model = TFAutoModelForSeq2SeqLM.from_pretrained("LukasStankevicius/t5-base-lithuanian-news-summaries-175", from_pt=True)
 
 data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model, return_tensors="tf")
 
 train_set = train_tokenized.to_tf_dataset(
     shuffle=True,
-    batch_size=8,
+    batch_size=4,
     collate_fn=data_collator
 )
 
 val_set = test_tokenized.to_tf_dataset(
     shuffle=False,
-    batch_size=8,
+    batch_size=4,
     collate_fn=data_collator
 )
 
@@ -68,12 +68,12 @@ history = model.fit(
     epochs=20
     )
 
-model.save_pretrained("gnm-t5")
-tokenizer.save_pretrained("gnm-t5")
+model.save_pretrained("trained_models/gnm-t5-liet-var2")
+tokenizer.save_pretrained("trained_models/gnm-t5-liet-var2")
 
 data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model, return_tensors="tf")
 
-print("\n🧪 Testuojame modelį su keliomis ivestimis:\n")
+print("\nTestuojame modelį su keliomis ivestimis:\n")
 for i in range(3):
     tekstas = test_df.iloc[i]["input"]
     tikras = test_df.iloc[i]["target"]

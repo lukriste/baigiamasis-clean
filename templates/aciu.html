@@ -1,10 +1,34 @@
 <!DOCTYPE html>
 <html lang="lt">
-<head><title>Ačiū</title></head>
+<head>
+    <meta charset="UTF-8">
+    <title>Ačiū!</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
 <body>
-    <h1>Ačiū!</h1>
-    <p>Modelio atsakymas:</p>
-    <p>{{ atsakymas }}</p>
-    <a href="/">Grįžti atgal</a>
+    <h1>Ačiū už atsakymą!</h1>
+
+    <p><strong>Pasirinktas simptomas:</strong> {{ simptomas }}</p>
+    <p><strong>Naudotas modelis:</strong> {{ naudotas_modelis }}</p>
+
+    <h2>AI sugeneruotas atsakymas:</h2>
+    <p>{{ atsakymas_ai }}</p>
+
+    <h2>Duomenų bazės atsakymas:</h2>
+    <p>{{ atsakymas_db }}</p>
+
+    <h2>Panaši situacija:</h2>
+    <p>{{ situacija }}</p>
+
+    <form method="POST" action="/ivertinti">
+        <input type="hidden" name="simptomas" value="{{ simptomas }}">
+        <label for="ivertinimas"><strong>Kaip vertinate AI atsakymą?</strong></label><br>
+        <select name="ivertinimas" required>
+            <option value="">-- Pasirinkite --</option>
+            <option value="teigiamas">Teigiamas</option>
+            <option value="neigiamas">Neigiamas</option>
+        </select><br><br>
+        <button type="submit">Pateikti vertinimą</button>
+    </form>
 </body>
 </html>

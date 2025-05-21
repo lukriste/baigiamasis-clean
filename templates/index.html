@@ -2,19 +2,77 @@
 <html lang="lt">
 <head>
     <meta charset="UTF-8">
-    <title>AI Atsakymas</title>
+    <title>Simptomo analizė</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+    function tikrintiAmziu(el) {
+        const klaida = document.getElementById("amzius-klaida");
+        const verte = parseInt(el.value);
+        if (el.value === "") {
+            klaida.textContent = "";
+            return;
+        }
+        if (isNaN(verte) || verte < 1 || verte > 110) {
+            klaida.textContent = "Neteisingai įvestas amžius!";
+            el.setCustomValidity("Neteisingai įvestas amžius!");
+        } else {
+            klaida.textContent = "";
+            el.setCustomValidity("");
+        }
+    }
+    </script>
 </head>
 <body>
-    <h1>Įveskite klausimą ar tekstą</h1>
-    <form method="POST">
-         <input type="text" name="simptomas" required>
-         <textarea name="ivestis" required></textarea>
-         <button type="submit">Siųsti</button>
-    </form>
+    <h1>GNM simptomų analizė</h1>
 
-    {% if atsakymas %}
-        <h2>AI atsakymas:</h2>
-        <p>{{ atsakymas }}</p>
+    {% if klaidos %}
+        <ul class="klaidos">
+        {% for klaida in klaidos %}
+            <li style="color: red;">{{ klaida }}</li>
+        {% endfor %}
+        </ul>
     {% endif %}
-</body>
-</html>
+
+    <form method="POST">
+    <!-- Simptomas iš sąrašo -->
+    <label for="simptomas"><strong>Pasirinkite simptomą:</strong></label><br>
+    <select name="simptomas">
+        <option value="">-- Pasirinkite simptomą --</option>
+        {% for s in simptomai %}
+            <option value="{{ s }}" {% if pasirinktas_simptomas == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+    </select><br><br>
+    <!-- Arba įveskite savo -->
+    <label for="kitas_simptomas"><strong>Arba įveskite savo simptomą:</strong></label><br>
+    <input type="text" name="kitas_simptomas" placeholder="Pvz.: sloga" value="{{ pasirinktas_kitas or '' }}"><br><br>
+
+
+    <!-- Nauja dalis: modelio pasirinkimas -->
+    <label for="modelis"><strong>Pasirinkite modelį:</strong></label><br>
+    <select name="modelis" required>
+        <option value="">-- Pasirinkite modelį --</option>
+        {% for modelis in modeliai %}
+            <option value="{{ modelis }}" {% if pasirinktas_modelis == modelis %}selected{% endif %}>{{ modelis }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <!-- Amžius -->
+    <label><strong>Kiek jums metų?</strong></label><br>
+    <input type="number" name="amzius" required min="1" max="110"
+           value="{{ amzius or '' }}" oninput="tikrintiAmziu(this)">
+    <span id="amzius-klaida" class="klaida"></span><br><br>
+
+    <!-- Lytis -->
+    <label><strong>Lytis:</strong></label><br>
+    <select name="lytis">
+        <option value="">-- Pasirinkite --</option>
+        <option value="vyras" {% if lytis == "vyras" %}selected{% endif %}>Vyras</option>
+        <option value="moteris" {% if lytis == "moteris" %}selected{% endif %}>Moteris</option>
+    </select><br><br>
+
+    <!-- Įvykis prieš simptomą -->
+    <label for="ivestis"><strong>Kas gero ar nemalonaus nutiko prieš atsirandant simptomui?</strong></label><br>
+    <textarea name="ivestis" rows="4" cols="50" placeholder="Pvz.: stresas darbe, pokalbis, įvykis, atostogos prasidėjo ir pan...">{{ ivestis_pradinis or '' }}</textarea><br><br>
+
+    <button type="submit">Gauti atsakymą</button>
+</form>

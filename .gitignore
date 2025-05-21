@@ -172,11 +172,12 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+# Išsaugoti modeliai
+trained_models/
 
+# Dar kiti failai
 *.csv
 *.xlsx
-gnm-t5/tf_model.h5
-gnm-t5
 *.ipynb_checkpoints/
 data/
 config.py

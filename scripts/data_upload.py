@@ -29,7 +29,7 @@ df = df.rename(columns={
 df["simptomas"] = df["simptomas"].apply(lambda x: normalizuoti_teksta(x).lower())
 df["ivestis"] = df["ivestis"].apply(lambda x: normalizuoti_teksta(x).lower())
 df["isvestis"] = df["isvestis"].apply(normalizuoti_teksta)
-df["saltinis"] = "excel"  # pažymim, kad tai ne iš vartotojo
+df["saltinis"] = "excel" 
 
 
 engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)

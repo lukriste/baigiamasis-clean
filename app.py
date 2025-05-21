@@ -4,6 +4,7 @@ from extensions import db, migrate
 from models import Simptomas
 from routes import setup_routes  # ← importuoji maršrutus
 
+
 app = Flask(__name__)
 app.config.from_object(Config)
 
