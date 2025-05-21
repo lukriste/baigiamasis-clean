@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import make_pipeline
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix,  precision_score, recall_score, f1_score, balanced_accuracy_score,accuracy_score
 import seaborn as sns
 import matplotlib.pyplot as plt
 from duomenu_tvarkymas import grupuoti_konflikta,  normalizuoti_teksta, sutvarkyti_sinonimus
@@ -59,3 +59,9 @@ plt.show()
 tekstas = "skausmas gerklėje, sunku kalbėti"
 prognoze = modelis.predict([tekstas])[0]
 print(f"\nPrognozuojamas konfliktas: {prognoze}")
+
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Balanced Accuracy:", balanced_accuracy_score(y_test, y_pred))
+print("Precision (svertinis):", precision_score(y_test, y_pred, average='weighted'))
+print("Recall (svertinis):", recall_score(y_test, y_pred, average='weighted'))
+print("F1-score (svertinis):", f1_score(y_test, y_pred, average='weighted'))

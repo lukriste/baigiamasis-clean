@@ -8,8 +8,8 @@ from extensions import db
 from rapidfuzz import fuzz
 import evaluate
 # Įkeliame išsaugotą modelį
-model = TFAutoModelForSeq2SeqLM.from_pretrained("trained_models/gnm-t5-liet-var2")
-tokenizer = T5Tokenizer.from_pretrained("trained_models/gnm-t5-liet-var2")
+model = TFAutoModelForSeq2SeqLM.from_pretrained("trained_models/gnm-t5-var1")
+tokenizer = T5Tokenizer.from_pretrained("trained_models/gnm-t5-var1")
 
 def gauti_modelio_atsakyma(simptomas: str, ivestis: str) -> str:
     if not simptomas:
