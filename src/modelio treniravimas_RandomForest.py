@@ -1,4 +1,3 @@
-# 📘 GNM Konfliktų Klasifikavimas su TF-IDF + Random Forest
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -11,7 +10,7 @@ import matplotlib.pyplot as plt
 from duomenu_tvarkymas import grupuoti_konflikta,  normalizuoti_teksta, sutvarkyti_sinonimus
 from sqlalchemy import create_engine
 
-# 1. Duomenų įkėlimas
+
 engine = create_engine("mysql+pymysql://lukriste:Astikiusavimi100@localhost/gnm")
 
 df = pd.read_sql("SELECT * FROM simptomai", con=engine)
@@ -20,7 +19,7 @@ df["simptomas"] = df["simptomas"].apply(normalizuoti_teksta)
 df["sinonimai"] = df["sinonimai"].apply(sutvarkyti_sinonimus)
 df["GNM_konfliktas"] = df["GNM_konfliktas"].apply(normalizuoti_teksta)
 
-df = df[df["GNM_konfliktas"].notna()]  # Pašalinti tuščius targetus
+df = df[df["GNM_konfliktas"].notna()]  
 df["input_text"] = df["simptomas"].fillna("") + " " + df["sinonimai"].fillna("")
 df["konflikto_grupe"] = df["GNM_konfliktas"].apply(grupuoti_konflikta)
 

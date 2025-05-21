@@ -4,41 +4,31 @@
     <meta charset="UTF-8">
     <title>Ačiū!</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-
 </head>
 <body>
-    <h1>Ačiū už pateiktą informaciją!</h1>
+    <h1>Ačiū už atsakymą!</h1>
 
-    <div class="atsakymas-blokas">
-        <h2>Rankinis (GNM) atsakymas iš duomenų bazės:</h2>
-        <p>{{ atsakymas_db }}</p>
-    </div>
+    <p><strong>Pasirinktas simptomas:</strong> {{ simptomas }}</p>
+    <p><strong>Naudotas modelis:</strong> {{ naudotas_modelis }}</p>
 
-    <div class="atsakymas-blokas">
-        <h2>AI atsakymas:</h2>
-        <p>{{ atsakymas_ai }}</p>
+    <h2>AI sugeneruotas atsakymas:</h2>
+    <p>{{ atsakymas_ai }}</p>
 
-        <form method="POST" action="/ivertinti">
-            <fieldset>
-                <legend>Ar šis AI atsakymas buvo naudingas?</legend>
-                <label>
-                    <input type="radio" name="ivertinimas" value="teigiamas" required> Taip
-                </label><br>
-                <label>
-                    <input type="radio" name="ivertinimas" value="neigiamas"> Ne
-                </label><br>
-                <input type="hidden" name="simptomas" value="{{ simptomas }}">
-                <button type="submit">Pateikti įvertinimą</button>
-            </fieldset>
-        </form>
-    </div>
+    <h2>Duomenų bazės atsakymas:</h2>
+    <p>{{ atsakymas_db }}</p>
 
-    <div class="atsakymas-blokas">
-        <h3>Pavyzdinė situacija (pagal AI atsakymą):</h3>
-        <p>{{ situacija }}</p>
-        
-    </div>
+    <h2>Panaši situacija:</h2>
+    <p>{{ situacija }}</p>
 
-    <a href="/">Grįžti į pradžią</a>
+    <form method="POST" action="/ivertinti">
+        <input type="hidden" name="simptomas" value="{{ simptomas }}">
+        <label for="ivertinimas"><strong>Kaip vertinate AI atsakymą?</strong></label><br>
+        <select name="ivertinimas" required>
+            <option value="">-- Pasirinkite --</option>
+            <option value="teigiamas">Teigiamas</option>
+            <option value="neigiamas">Neigiamas</option>
+        </select><br><br>
+        <button type="submit">Pateikti vertinimą</button>
+    </form>
 </body>
 </html>

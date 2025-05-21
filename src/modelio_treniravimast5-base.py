@@ -73,7 +73,7 @@ tokenizer.save_pretrained("trained_models/gnm-t5-liet-var2")
 
 data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model, return_tensors="tf")
 
-print("\n🧪 Testuojame modelį su keliomis ivestimis:\n")
+print("\nTestuojame modelį su keliomis ivestimis:\n")
 for i in range(3):
     tekstas = test_df.iloc[i]["input"]
     tikras = test_df.iloc[i]["target"]

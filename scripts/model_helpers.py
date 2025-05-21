@@ -7,11 +7,9 @@ from models import Simptomas
 from extensions import db
 from rapidfuzz import fuzz
 import evaluate
-# Įkeliame išsaugotą modelį
-model = TFAutoModelForSeq2SeqLM.from_pretrained("trained_models/gnm-t5-var1")
-tokenizer = T5Tokenizer.from_pretrained("trained_models/gnm-t5-var1")
 
-def gauti_modelio_atsakyma(simptomas: str, ivestis: str) -> str:
+
+def gauti_modelio_atsakyma(simptomas: str, ivestis: str,modelio_failas:str) -> str:
     if not simptomas:
         return "Reikia nurodyti bent simptomą."
 
@@ -20,6 +18,10 @@ def gauti_modelio_atsakyma(simptomas: str, ivestis: str) -> str:
         tekstas += f" situacija: {ivestis}"
 
     try:
+        model_kelias = os.path.join("trained_models", modelio_failas)
+        model = TFAutoModelForSeq2SeqLM.from_pretrained(model_kelias)
+        tokenizer = T5Tokenizer.from_pretrained(model_kelias)
+
         input_ids = tokenizer(tekstas, return_tensors="tf", truncation=True, padding=True).input_ids
         output_ids = model.generate(input_ids, max_length=128)
         atsakymas = tokenizer.decode(output_ids[0], skip_special_tokens=True)
@@ -42,9 +44,9 @@ def gauti_teisinga_atsakyma_pagal_simptoma(simptomas: str) -> str:
         Simptomas.simptomas.ilike(f"%{simptomas.lower()}%"),
         Simptomas.saltinis == "excel"
     ).first()
-    return atsakymas.isvestis if atsakymas else "🟡 Atsakymas bazėje nerastas."
+    return atsakymas.isvestis if atsakymas else "Atsakymas bazėje nerastas."
 
-def gauti_pavyzdine_situacija_ir_vertinimas(ai_atsakymas: str, riba: int = 60):
+def gauti_pavyzdine_situacija(ai_atsakymas: str, riba: int = 75):
     visi_excel = Simptomas.query.filter_by(saltinis='excel').all()
     geriausias = None
     geriausias_sutapimas = 0
@@ -56,17 +58,9 @@ def gauti_pavyzdine_situacija_ir_vertinimas(ai_atsakymas: str, riba: int = 60):
             geriausias = irasas
 
     if geriausias and geriausias_sutapimas >= riba:
-        return (
-            geriausias.ivestis,
-            "Atsakymas pagrįstas duomenų baze (patikimumas aukštas)",
-            geriausias_sutapimas
-        )
+        return geriausias.ivestis
     else:
-        return (
-            "Situacija nerasta – AI atsakymas galimai netikslus.",
-            "Modelio atsakymas neatitiko jokio žinomo duomenų bazės įrašo",
-            geriausias_sutapimas
-        )
+        return "Situacija nerasta . AI atsakymas galimai netikslus."
 
 def ivertinti_atsakyma(simptomas: str, ivertinimas: str):
     irasas = Simptomas.query.filter_by(simptomas=simptomas.lower(), saltinis='vartotojas').order_by(Simptomas.created_at.desc()).first()
@@ -77,10 +71,9 @@ def ivertinti_atsakyma(simptomas: str, ivertinimas: str):
 
 def suformuoti_situacija(form):
     return (
-        f"{form.get('lytis', 'Asmuo')} ({form.get('amzius', '?')} m.) "
+        f"{form.get('lytis')} ({form.get('amzius')} m.) "
         f"pajuto simptomą. Prieš tai nutiko: {form.get('ivestis', '')}. "
-        f"Emociškai įvykis įvertintas kaip {form.get('emocija', 'nežinoma')} patirtis."
-    )
+           )
 
 def irasyti_ivertinima_i_csv(simptomas, ivestis, modelio_ats, tikras_ats, rouge_score, bleu_score):
     laukai = ["timestamp", "simptomas", "ivestis", "modelio_ats", "tikras_ats", "rouge", "bleu"]
@@ -141,3 +134,12 @@ def rasti_artimiausia_simptoma(ivestas_simptomas, riba=70):
         return geriausias.simptomas
     else:
         return ivestas_simptomas
+
+def nuskaityti_modeliu_sarasa(katalogas="trained_models"):
+    modeliai = []
+    if os.path.exists(katalogas):
+        for vardas in os.listdir(katalogas):
+            kelias = os.path.join(katalogas, vardas)
+            if os.path.isdir(kelias):
+                modeliai.append(vardas)
+    return sorted(modeliai)
